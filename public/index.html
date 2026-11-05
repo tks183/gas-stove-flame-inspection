@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>卡式炉试火实时检测系统</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="glow glow-a"></div>
+  <div class="glow glow-b"></div>
+
+  <main class="shell">
+    <header class="hero">
+      <div class="brand">
+        <span class="brand-icon">🔥</span>
+        <div>
+          <h1>卡式炉试火实时检测系统</h1>
+          <p>后端 FFmpeg 拉流 · YOLO + 传统 CV 双通道融合 · WebSocket 实时推送</p>
+        </div>
+      </div>
+      <div class="status-pills">
+        <div id="backendPill" class="health-pill loading"><span class="dot"></span><span id="backendText">模型加载中</span></div>
+        <div id="cameraPill" class="health-pill"><span class="dot"></span><span id="cameraText">视频流未启动</span></div>
+        <div id="wsPill" class="health-pill error"><span class="dot"></span><span id="wsText">WebSocket 未连接</span></div>
+      </div>
+    </header>
+
+    <section class="layout">
+      <div class="card camera-card">
+        <div class="stage-wrap">
+          <img id="streamImage" alt="实时检测画面" />
+          <canvas id="overlayCanvas"></canvas>
+          <div id="stagePlaceholder" class="stage-placeholder">
+            <div class="camera-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 10l4.55-2.28A1 1 0 0 1 21 8.62v6.76a1 1 0 0 1-1.45.9L15 14M4 6h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h2>等待视频流</h2>
+            <p>选择摄像头后点击「启动视频流」</p>
+          </div>
+          <div id="liveBadge" class="live-badge hidden"><span class="live-dot"></span>LIVE</div>
+          <div id="fpsBadge" class="fps-badge">-- FPS</div>
+        </div>
+
+        <div class="source-row">
+          <select id="cameraSelect" class="select" aria-label="摄像头设备">
+            <option value="">正在读取摄像头…</option>
+          </select>
+          <button id="refreshBtn" class="ghost-btn small" type="button">刷新</button>
+        </div>
+
+        <div class="actions">
+          <button id="startStreamBtn" class="primary-btn" type="button">启动视频流</button>
+          <button id="stopStreamBtn" class="ghost-btn" type="button" disabled>停止视频流</button>
+        </div>
+
+        <div class="test-actions">
+          <button id="startTestBtn" class="action-btn normal" type="button">开始试火</button>
+          <button id="extinguishBtn" class="action-btn danger" type="button">熄火检测</button>
+          <button id="resetBtn" class="action-btn neutral" type="button">复位</button>
+        </div>
+
+        <p id="errorText" class="error-text hidden"></p>
+      </div>
+
+      <aside class="card dashboard">
+        <div class="result-head">
+          <h2>实时判定</h2>
+          <span id="phaseTag" class="task-tag">待机</span>
+        </div>
+
+        <div id="statusCard" class="status-card unknown">
+          <div id="statusIcon" class="status-icon">?</div>
+          <div>
+            <strong id="statusTitle">等待开始</strong>
+            <p id="statusDesc">启动视频流后开始实时分析</p>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric"><span>fire</span><strong id="correctCount">0</strong></div>
+          <div class="metric"><span>popular</span><strong id="errorCount">0</strong></div>
+          <div class="metric"><span>YOLO 耗时</span><strong id="yoloLatency">--</strong></div>
+          <div class="metric"><span>视频帧率</span><strong id="videoFpsValue">--</strong></div>
+          <div class="metric"><span>分析帧率</span><strong id="fpsValue">--</strong></div>
+          <div class="metric"><span>推理后端</span><strong id="backendValue">--</strong></div>
+        </div>
+
+        <div class="reason-box">
+          <span>判定依据</span>
+          <p id="reasonText">—</p>
+        </div>
+
+        <div class="section-title">实时日志</div>
+        <div id="logBox" class="log-box"></div>
+      </aside>
+    </section>
+
+    <footer>
+      <span>Node.js 22 + ONNX Runtime (DirectML GPU) + FFmpeg + WebSocket</span>
+      <span>后端流处理架构 · 前端仅负责展示</span>
+    </footer>
+  </main>
+
+  <script src="./app.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "server": {
+    "port": 3000
+  },
+  "model": {
+    "path": "models/exp-4.onnx",
+    "task": "detection",
+    "inputSize": [
+      640,
+      640
+    ],
+    "color": "rgb",
+    "resizeMode": "letterbox",
+    "normalize": {
+      "scale": 0.00392156862745098,
+      "mean": [
+        0,
+        0,
+        0
+      ],
+      "std": [
+        1,
+        1,
+        1
+      ]
+    },
+    "deviceId": 1
+  },
+  "classes": [
+    "fire",
+    "popular"
+  ],
+  "issueClasses": [
+    "popular"
+  ],
+  "normalClasses": [
+    "fire"
+  ],
+  "confidenceThreshold": 0.25,
+  "nmsThreshold": 0.45,
+  "inferEveryNFrames": 1,
+  "camera": {
+    "type": "dshow",
+    "deviceName": "Orbbec Femto Bolt RGB Camera",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "rtspUrl": ""
+  },
+  "cv": {
+    "flameThreshold": 0.006,
+    "motionThreshold": 2.5,
+    "sampleStep": 4
+  },
+  "fusion": {
+    "stableAfterMs": 1200,
+    "extinguishGraceMs": 3000
+  },
+  "yoloIntervalMs": 300,
+  "sendRawFrames": true
+}

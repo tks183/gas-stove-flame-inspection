@@ -1,0 +1,21 @@
+# dependencies
+node_modules/
+
+# runtime files
+uploads/
+*.log
+server.out.log
+server.err.log
+
+# temporary / backups
+backups/
+*.tar.gz
+*.zip
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+models/archive/
+models\\archive\\
