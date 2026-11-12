@@ -5,7 +5,7 @@
   "description": "卡式炉试火实时流处理检测系统（Node.js + FFmpeg + ONNX Runtime + WebSocket）",
   "type": "module",
   "engines": {
-    "node": "22.18.0"
+    "node": "26.13.1"
   },
   "scripts": {
     "start": "node server.js",

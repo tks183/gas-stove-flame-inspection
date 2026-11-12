@@ -24,19 +24,29 @@
         1
       ]
     },
-    "deviceId": 1
+    "deviceId": 1,
+    "linux": {
+      "runtime": "rknn",
+      "path": "models/exp-4.rknn",
+      "inputSize": [
+        640,
+        640
+      ],
+      "pythonPath": "python3",
+      "workerPath": "src/rknn_worker.py"
+    }
   },
   "classes": [
-    "fire",
-    "popular"
+    "Correct",
+    "error"
   ],
   "issueClasses": [
-    "popular"
+    "error"
   ],
   "normalClasses": [
-    "fire"
+    "Correct"
   ],
-  "confidenceThreshold": 0.5,
+  "confidenceThreshold": 0.25,
   "nmsThreshold": 0.45,
   "inferEveryNFrames": 1,
   "camera": {
@@ -45,7 +55,16 @@
     "width": 1920,
     "height": 1080,
     "fps": 30,
-    "rtspUrl": ""
+    "rtspUrl": "",
+    "linux": {
+      "type": "v4l2",
+      "deviceName": "/dev/video0",
+      "inputFormat": "mjpeg",
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "rtspUrl": ""
+    }
   },
   "cv": {
     "flameThreshold": 0.006,

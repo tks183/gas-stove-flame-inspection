@@ -1,7 +1,18 @@
 import { parentPort, workerData } from 'node:worker_threads';
-import { Detector } from './detector.js';
 
-const detector = new Detector(workerData.config, workerData.rootDir);
+const config = workerData.config;
+const rootDir = workerData.rootDir;
+const useRknn = process.platform !== 'win32' && config.model?.linux?.runtime === 'rknn';
+
+let detector;
+if (useRknn) {
+  const { RknnDetector } = await import('./rknn-detector.js');
+  const platformModel = { ...config.model, ...config.model.linux };
+  detector = new RknnDetector({ ...config, model: platformModel }, rootDir);
+} else {
+  const { Detector } = await import('./detector.js');
+  detector = new Detector(config, rootDir);
+}
 
 try {
   await detector.load();

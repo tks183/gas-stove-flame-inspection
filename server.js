@@ -47,7 +47,16 @@ let lastFrameAt = 0;
 let fps = 0;
 let lastFpsAt = Date.now();
 let fpsCounter = 0;
-let currentSource = { ...config.camera };
+function getDefaultCameraSource() {
+  const base = { ...(config.camera || {}) };
+  delete base.linux;
+  if (process.platform !== 'win32' && config.camera?.linux) {
+    return { ...base, ...config.camera.linux };
+  }
+  return base;
+}
+
+let currentSource = getDefaultCameraSource();
 
 function log(level, message) {
   const payload = { type: 'log', level, message, timestamp: Date.now() };
@@ -113,6 +122,19 @@ class CameraStream extends EventEmitter {
         'pipe:1'
       ];
     }
+    if (this.source.type === 'v4l2') {
+      const inputFormat = this.source.inputFormat || 'mjpeg';
+      return [
+        '-hide_banner', '-loglevel', 'warning',
+        '-f', 'v4l2',
+        '-input_format', inputFormat,
+        '-video_size', `${width}x${height}`,
+        '-framerate', String(fps),
+        '-i', this.source.deviceName,
+        '-f', 'mjpeg', '-q:v', '5', '-r', String(fps),
+        'pipe:1'
+      ];
+    }
     return [
       '-hide_banner', '-loglevel', 'warning',
       '-f', 'dshow',
@@ -136,7 +158,8 @@ class CameraStream extends EventEmitter {
 
 async function startCamera(source = {}) {
   if (cameraRunning) return { ok: true, message: '摄像头已经在运行' };
-  currentSource = { ...config.camera, ...source };
+  currentSource = { ...getDefaultCameraSource(), ...source };
+  delete currentSource.linux;
   if (currentSource.type === 'rtsp' && !currentSource.rtspUrl) {
     throw new Error('RTSP 地址为空');
   }
@@ -270,7 +293,7 @@ app.get('/api/config', (_req, res) => {
     classes: config.classes,
     issueClasses: config.issueClasses,
     confidenceThreshold: config.confidenceThreshold,
-    camera: config.camera,
+    camera: getDefaultCameraSource(),
     fusion: config.fusion
   });
 });
@@ -307,7 +330,18 @@ app.get('/api/status', (_req, res) => {
   res.json({ ok: true, cameraRunning, source: currentSource, metrics: latestMetrics });
 });
 
-function listCameras() {
+async function listCameras() {
+  if (process.platform !== 'win32') {
+    const devices = [];
+    try {
+      const names = await fs.readdir('/dev');
+      for (const name of names) {
+        if (/^video\d+$/.test(name)) devices.push(`/dev/${name}`);
+      }
+    } catch { /* ignore */ }
+    return devices.sort();
+  }
+
   return new Promise((resolve, reject) => {
     const ffmpeg = spawn(currentSource.ffmpegPath || 'ffmpeg', [
       '-hide_banner', '-list_devices', 'true', '-f', 'dshow', '-i', 'dummy'

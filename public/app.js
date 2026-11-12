@@ -35,6 +35,7 @@ let ws = null;
 let reconnectTimer = null;
 let lastFrameUrl = '';
 let cameraRunning = false;
+let configuredCameraType = 'dshow';
 let latestBoxes = [];
 let latestImageWidth = 0;
 let latestImageHeight = 0;
@@ -78,6 +79,15 @@ async function loadHealth() {
     backendPill.className = 'health-pill error';
     backendText.textContent = '模型未就绪';
     showError(err.message);
+  }
+}
+
+async function loadCameraConfig() {
+  try {
+    const data = await fetchJSON('/api/config');
+    configuredCameraType = data.camera?.type || 'dshow';
+  } catch (err) {
+    console.warn('读取摄像头配置失败', err);
   }
 }
 
@@ -289,7 +299,7 @@ startStreamBtn.addEventListener('click', async () => {
     await fetchJSON('/api/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'dshow', deviceName })
+      body: JSON.stringify({ type: configuredCameraType, deviceName })
     });
     setCameraState(true);
     addLog('info', `已启动视频流: ${deviceName}`);
@@ -316,6 +326,6 @@ extinguishBtn.addEventListener('click', () => sendCommand('extinguish_test'));
 resetBtn.addEventListener('click', () => sendCommand('reset'));
 refreshBtn.addEventListener('click', loadCameras);
 
-loadHealth().then(loadCameras);
+loadHealth().then(loadCameraConfig).then(loadCameras);
 connectWebSocket();
 setInterval(loadHealth, 5000);
