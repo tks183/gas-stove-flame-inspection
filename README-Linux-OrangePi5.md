@@ -188,3 +188,29 @@ https://github.com/airockchip/rknn-toolkit2/tree/master/rknn-toolkit-lite2/packa
 ```bash
 pip3 install --no-deps rknn_toolkit_lite2-2.5.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
 ```
+
+## 10. RKNN Toolkit Lite2 依赖补充
+
+`install-rknn-lite.sh` 会额外安装 RKNN 运行所需的 Python 依赖：
+
+```bash
+python3 -m pip install --break-system-packages ruamel.yaml
+```
+
+如果手动安装 RKNN wheel 后启动时报：
+
+```text
+ModuleNotFoundError: No module named 'ruamel'
+```
+
+执行：
+
+```bash
+pip3 install --break-system-packages ruamel.yaml
+```
+
+然后重新启动：
+
+```bash
+./start.sh
+```

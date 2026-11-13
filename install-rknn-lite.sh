@@ -36,6 +36,9 @@ if ! curl -fL --retry 3 -o "$WHEEL_PATH" "$WHEEL_URL"; then
   exit 1
 fi
 
+# RKNN Toolkit Lite2 runtime dependencies
+python3 -m pip install --break-system-packages ruamel.yaml 2>/dev/null || python3 -m pip install ruamel.yaml
+
 # Debian 12 may enforce PEP 668; use --break-system-packages when available.
 if ! python3 -m pip install --no-deps --force-reinstall "$WHEEL_PATH"; then
   python3 -m pip install --break-system-packages --no-deps --force-reinstall "$WHEEL_PATH"

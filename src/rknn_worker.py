@@ -173,7 +173,7 @@ def main():
             canvas, scale, pad_x, pad_y = letterbox(image)
             rgb = cv2.cvtColor(canvas, cv2.COLOR_BGR2RGB)
             started = time.perf_counter()
-            outputs = rknn.inference(inputs=[rgb])
+            outputs = rknn.inference(inputs=[np.expand_dims(rgb, axis=0)])
             latency = (time.perf_counter() - started) * 1000.0
             boxes = postprocess(outputs, scale, pad_x, pad_y, orig_w, orig_h)
             print(json.dumps({
